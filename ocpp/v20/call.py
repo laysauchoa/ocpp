@@ -68,6 +68,7 @@ class GetLogPayload:
     retry_interval: int = None
     log: Dict = field(default_factory=dict)
 
+
 @dataclass
 class GetLocalListVersionPayload:
     pass

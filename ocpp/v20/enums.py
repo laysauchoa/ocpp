@@ -172,7 +172,8 @@ class ChargePointErrorCode:
 
 class ConnectorStatusEnumType:
     """
-    A status can be reported for the Connector of an EVSE of a Charging Station.
+    A status can be reported for the Connector of an EVSE of a
+    Charging Station.
     States considered Operative are: Available, Reserved and Occupied.
     States considered Inoperative are: Unavailable, Faulted.
     ConnectorStatusEnumType is used by:
@@ -334,7 +335,7 @@ class ComponentCriterionEnumType:
     problem = "Problem"
 
 
-#TODO: ConnectorEnumType
+# TODO: ConnectorEnumType
 
 
 class SetVariableStatusEnumType:
