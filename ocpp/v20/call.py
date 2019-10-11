@@ -31,6 +31,12 @@ class ChangeAvailabilityPayload:
 
 
 @dataclass
+class CostUpdatedPayload:
+    total_cost: float
+    transaction_id: int
+
+
+@dataclass
 class SetVariablesPayload:
     # TODO: Should we create a SetVariableDataType Dict and pass it here?
     set_variable_data: Dict = field(default_factory=dict)
@@ -44,8 +50,20 @@ class ClearCachePayload:
 @dataclass
 class ClearChargingProfilePayload:
     evse_id: int = None
+    charging_profile: Dict = None
+
+
+@dataclass
+class DeleteCertificatePayload:
+    certificate_hash_data: Dict = field(default_factory=dict)
+
+
+
+@dataclass
+class GetChargingProfilesPayload:
+    request_id: int = None
+    evse_id: int = None
     charging_profile: Dict = field(default_factory=dict)
-    stack_level: int = None
 
 
 @dataclass
@@ -53,6 +71,49 @@ class GetCompositeSchedulePayload:
     evse_id: int
     duration: int
     charging_rate_unit: str = None
+
+
+@dataclass
+class GetMonitoringReportPayload:
+    request_id: int = None
+    monitoring_criteria: str = None
+    component_variable: Dict = field(default_factory=dict)
+
+
+@dataclass
+class GetReportPayload:
+    request_id: int = None
+    component_criteria: str = None
+    component_variable: Dict = None
+
+
+@dataclass
+class InstallCertificatePayload:
+    certificate_type: str
+    certificate: str
+
+
+@dataclass
+class NotifyCentralChargingNeedsPayload:
+    evse_id: int
+    sa_schedule: Dict = field(default_factory=dict)
+
+
+@dataclass
+class Renegotiate15118SchedulePayload:
+    evse: Dict = field(default_factory=dict)
+
+
+@dataclass
+class SetNetworkProfilePayload:
+    configuration_slot: int
+    connection_data: Dict
+
+
+@dataclass
+class GetBaseReportPayload:
+    request_id: int
+    report_base: str
 
 
 @dataclass
@@ -75,6 +136,24 @@ class GetLocalListVersionPayload:
 
 
 @dataclass
+class GetInstalledCertificateIdsPayload:
+    type_of_certificate: str
+
+
+@dataclass
+class GetTransactionStatusPayload:
+    transaction_id: str = None
+
+
+
+@dataclass
+class NotifyChargingLimitPayload:
+    evse_id: int = None
+    charging_limit: Dict = field(default_factory=dict)
+    charging_schedule: Dict
+
+
+@dataclass
 class RequestStartTransactionPayload:
     evse_id: int = None
     remote_start_id: int
@@ -90,7 +169,7 @@ class RequestStopTransactionPayload:
 @dataclass
 class ReserveNowPayload:
     id_token: Dict = field(default_factory=dict)
-    group_id_token: Dict
+    group_id_token: Dict = None
     reservation: Dict = field(default_factory=dict)
 
 
@@ -103,13 +182,18 @@ class ResetPayload:
 class SendLocalListPayload:
     version_number: int
     update_type: str
-    local_authorization_list: List = field(default_factory=list)
+    local_authorization_list: List = None
 
 
 @dataclass
 class SetChargingProfilePayload:
     evse_id: int
-    charging_profile: Dict
+    charging_profile: Dict = field(default_factory=dict)
+
+
+@dataclass
+class SetDisplayMessagePayload:
+    message: Dict = field(default_factory=dict)
 
 
 @dataclass
@@ -126,11 +210,10 @@ class UnlockConnectorPayload:
 
 @dataclass
 class UpdateFirmwarePayload:
-    firmware: Dict
-    request_id: int
-    retrieve_date: str
     retries: int = None
     retry_interval: int = None
+    request_id: int
+    firmware: Dict = field(default_factory=dict)
 
 
 # The CALL messages that flow from Charge Point to Central System are listed
@@ -140,7 +223,7 @@ class UpdateFirmwarePayload:
 class AuthorizePayload:
     evse_id: int = None
     id_token: Dict = field(default_factory=dict)
-    id_tag: str
+    _15118_certificate_hash_data: Dict
 
 
 @dataclass
@@ -150,9 +233,54 @@ class BootNotificationPayload:
 
 
 @dataclass
+class ClearedChargingLimitPayload:
+    charging_limit_source: str
+    evse_id: int = None
+
+
+@dataclass
+class DiagnosticStatusNotificationPayload:
+    status: str
+
+
+@dataclass
+class GetCertificateStatusPayload:
+    ocsp_request_data: Dict = field(default_factory=dict)
+
+
+@dataclass
+class Get15118EVCertificate:
+    _15118_schema_version: str
+    exit_request: str
+
+
+@dataclass
 class LogStatusNotificationPayload:
     status: str
     request_id: int
+
+
+@dataclass
+class NotifyEventPayload:
+    generated_at: str
+    tbc: bool
+    seq_no: int
+    event_data: List = field(default_factory=list)
+    operational_status: str
+
+
+@dataclass
+class NotifyEVChargingNeedsPayload:
+    max_schedule_tuples: int = None
+    evse_id: int
+    charging_needs: Dict = field(default_factory=dict)
+
+
+@dataclass
+class NotifyEVChargingSchedulePayload:
+    time_base: str
+    evse_id: int
+    charging_schedule: Dict = field(default_factory=dict)
 
 
 @dataclass
@@ -173,6 +301,12 @@ class MeterValuesPayload:
     """
     evse_id: int
     meter_value: Dict = field(default_factory=dict)
+
+
+@dataclass
+class ReservationStatusUpdatePayload:
+    reservation_id: int
+    reservation_update_status: str
 
 
 @dataclass
@@ -197,6 +331,13 @@ class TransactionEventPayload:
     id_token: Dict = None
     evse: Dict = None
     meter_value: Dict = None
+
+
+@dataclass
+class Update15118EVCertificate:
+    _15118_schema_version: str
+    exit_request: str
+
 
 # The DataTransfer CALL can be send both from Central System as well as from a
 # Charge Point.
