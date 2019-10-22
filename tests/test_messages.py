@@ -53,9 +53,9 @@ def test_get_schema_with_valid_name():
     """
     Test if correct schema is returned and if schema is added to cache.
     """
-    schema = get_schema("Reset")
+    schema = get_schema(MessageType.Call, "Reset", ocpp_version="1.6")
 
-    assert schema == _schemas["Reset"]
+    assert schema == _schemas["v16/schemas/Reset.json"]
     assert schema == {
         "$schema": "http://json-schema.org/draft-04/schema#",
         "title": "ResetRequest",
@@ -81,7 +81,7 @@ def test_get_schema_with_invalid_name():
     Test if OSError is raised when schema validation file cannnot be found.
     """
     with pytest.raises(OSError):
-        get_schema("non-existing")
+        get_schema(MessageType.Call, "non-existing", ocpp_version="1.6")
 
 
 def test_validate_payload_with_valid_payload():
@@ -89,11 +89,13 @@ def test_validate_payload_with_valid_payload():
     Test if validate_payload doesn't return any exceptions when it's
     validating a valid payload.
     """
-    validate_payload(
-            {'currentTime': datetime.now().isoformat()},
-            'Heartbeat',
-            MessageType.CallResult
+    message = CallResult(
+        unique_id="1234",
+        action="Heartbeat",
+        payload={'currentTime': datetime.now().isoformat()}
     )
+
+    validate_payload(message, ocpp_version="1.6")
 
 
 def test_validate_payload_with_invalid_payload():
@@ -101,10 +103,14 @@ def test_validate_payload_with_invalid_payload():
     Test if validate_payload raises ValidationError when validation of
     payload failes.
     """
+    message = CallResult(
+        unique_id="1234",
+        action="Heartbeat",
+        payload={'invalid_key': True},
+    )
+
     with pytest.raises(ValidationError):
-        validate_payload(
-            {'invalid_key': True}, 'Heartbeat', MessageType.CallResult,
-        )
+        validate_payload(message, ocpp_version="1.6")
 
 
 def test_validate_payload_with_invalid_message_type_id():
@@ -113,7 +119,7 @@ def test_validate_payload_with_invalid_message_type_id():
     a message type id other than 2, Call, or 3, CallError.
     """
     with pytest.raises(ValidationError):
-        validate_payload({}, "BootNotification", -1)
+        validate_payload(dict(), ocpp_version="1.6")
 
 
 def test_validate_payload_with_non_existing_schema():
@@ -121,8 +127,14 @@ def test_validate_payload_with_non_existing_schema():
     Test if correct exception is raised when a validation schema cannot be
     found.
     """
+    message = CallResult(
+        unique_id="1234",
+        action="MagicSpell",
+        payload={'invalid_key': True},
+    )
+
     with pytest.raises(ValidationError):
-        validate_payload({}, "NonExistingAction", 2)
+        validate_payload(message, ocpp_version="1.6")
 
 
 def test_call_error_representation():

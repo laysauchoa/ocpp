@@ -82,10 +82,11 @@ class ChargePoint:
     Base Element containing all the necessary OCPP1.6J messages for messages
     initiated and received by the Central System
     """
-    def __init__(self, id, connection, response_timeout=30):
+    def __init__(self, id, connection, ocpp_version, response_timeout=30):
         """
 
         Args:
+
             charger_id (str): ID of the charger.
             connection: Connection to CP.
             response_timeout (int): When no response on a request is received
@@ -102,6 +103,8 @@ class ChargePoint:
         # A connection to the client. Currently this is an instance of gh
         self._connection = connection
 
+        self.ocpp_version = ocpp_version
+
         # A dictionary that hooks for Actions. So if the CS receives a it will
         # look up the Action into this map and execute the corresponding hooks
         # if exists.
@@ -117,6 +120,7 @@ class ChargePoint:
         # uuid.uuid4() is used, but it can be changed. This is meant primarily
         # for testing purposes to have predictable unique ids.
         self._unique_id_generator = uuid.uuid4
+
 
     async def start(self):
         while True:
@@ -237,6 +241,7 @@ class ChargePoint:
             unique_id=str(self._unique_id_generator()),
             action=payload.__class__.__name__[:-7],
             payload=remove_nones(camel_case_payload),
+            version=self.OCPP_VERSION,
         )
 
         # Use a lock to prevent make sure that only 1 message can be send at a
