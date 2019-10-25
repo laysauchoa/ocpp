@@ -241,7 +241,7 @@ class ChargePoint:
             unique_id=str(self._unique_id_generator()),
             action=payload.__class__.__name__[:-7],
             payload=remove_nones(camel_case_payload),
-            version=self.OCPP_VERSION,
+            #version=self.OCPP_VERSION, #this is not needed for OCPP2.0
         )
 
         # Use a lock to prevent make sure that only 1 message can be send at a
